@@ -10,9 +10,9 @@ docker logs -f fastapi
 docker exec -it fastapi curl -s http://keycloak:8080/realms/myrealm | jq .
 
 # Get token (example)
-curl -s -X POST "http://localhost:8080/realms/myrealm/protocol/openid-connect/token" \
+curl -s -X POST "http://192.168.0.19:8080/realms/myrealm/protocol/openid-connect/token" \
   -H "Content-Type: application/x-www-form-urlencoded" \
   -d "grant_type=password&client_id=fastapi-client&username=alice&password=alice123" | jq .
 
 # Call protected API
-curl -H "Authorization: Bearer <ACCESS_TOKEN>" http://localhost:9000/private
+curl -H "Authorization: Bearer <ACCESS_TOKEN>" http://192.168.0.19:9000/private

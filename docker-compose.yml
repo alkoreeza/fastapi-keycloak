@@ -1,0 +1,18 @@
+version: '3.9'
+services:
+  fastapi:
+    build: .
+    container_name: fastapi
+    environment:
+      KEYCLOAK_HOST: keycloak
+      KEYCLOAK_PORT: "8080"
+      KEYCLOAK_REALM: myrealm
+    ports:
+      - "9000:9000"
+    networks:
+      - keycloak_net
+
+networks:
+  keycloak_net:
+    external:
+      name: keycloak_default
