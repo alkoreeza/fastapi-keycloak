@@ -1,0 +1,13 @@
+fastapi-keycloak/ project with:
+
+main.py (FastAPI JWT verification)
+
+requirements.txt
+
+Dockerfile
+
+docker-compose.yml (connects existing Keycloak network)
+
+frontend/ (simple HTML + JS to sign-in and call API)
+
+README-quick.md (quick run & test commands)

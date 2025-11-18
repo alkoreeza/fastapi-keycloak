@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Keycloak Demo - Simple Login</title>
+</head>
+<body>
+  <h2>Simple Keycloak Login (lab)</h2>
+
+  <div>
+    <h3>Token (get using Resource Owner Password - for lab only)</h3>
+    <label>Username: <input id="username" value="alice"/></label><br/>
+    <label>Password: <input id="password" value="alice123" type="password"/></label><br/>
+    <label>Client ID: <input id="client_id" value="fastapi-client"/></label><br/>
+    <button id="getToken">Get Token</button>
+  </div>
+
+  <pre id="tokenArea" style="white-space:pre-wrap; border:1px solid #ccc; padding:10px; margin-top:10px;"></pre>
+
+  <div style="margin-top:10px">
+    <button id="callPublic">Call /public</button>
+    <button id="callPrivate">Call /private (requires token)</button>
+    <pre id="result" style="white-space:pre-wrap; border:1px solid #ccc; padding:10px; margin-top:10px;"></pre>
+  </div>
+
+  <script>
+    const server = window.location.hostname || "localhost";
+    const fastapiBase = `http://${server}:9000`;
+    const keycloakHost = server; // container host when tested locally
+    const keycloakRealm = "myrealm";
+
+    document.getElementById("getToken").onclick = async () => {
+      const u = document.getElementById("username").value;
+      const p = document.getElementById("password").value;
+      const client_id = document.getElementById("client_id").value;
+
+      const form = new URLSearchParams();
+      form.append("grant_type", "password");
+      form.append("client_id", client_id);
+      form.append("username", u);
+      form.append("password", p);
+
+      const tokenResp = await fetch(`http://${keycloakHost}:8080/realms/${keycloakRealm}/protocol/openid-connect/token`, {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: form.toString()
+      });
+      const data = await tokenResp.json();
+      document.getElementById("tokenArea").textContent = JSON.stringify(data, null, 2);
+      window._ACCESS_TOKEN = data.access_token;
+    };
+
+    document.getElementById("callPublic").onclick = async () => {
+      const r = await fetch(`${fastapiBase}/public`);
+      document.getElementById("result").textContent = await r.text();
+    };
+
+    document.getElementById("callPrivate").onclick = async () => {
+      const token = window._ACCESS_TOKEN;
+      if (!token) return alert("Get token first");
+      const r = await fetch(`${fastapiBase}/private`, {
+        headers: { "Authorization": "Bearer " + token }
+      });
+      document.getElementById("result").textContent = await r.text();
+    };
+  </script>
+</body>
+</html>
